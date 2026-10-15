@@ -91,4 +91,12 @@ const portfolioProjects = [
       "Web Design"
     ]
   }
+  ,{
+    "id": "tomato-care",
+    "title": "Tomato Care",
+    "category": "AI / Automation",
+    "description": "An AI-assisted tomato leaf analysis and care application designed to identify possible diseases from photos and explain practical next steps.",
+    "detailedDescription": "Tomato Care is designed to combine a local CNN classifier for eight tomato leaf categories with optional Gemini and OpenAI image analysis. Its proposed workflow includes photo uploads, symptom notes, structured care guidance, a disease library, scan history, care checklists, and downloadable reports. English and Roman Urdu AI reports make explanations more accessible. The project uses React, Python, FastAPI, and TensorFlow; cloud analysis requires an internet connection and an API key. Predictions indicate suspected conditions rather than confirmed diagnoses.",
+    "tags": ["Python", "React", "FastAPI", "TensorFlow", "Computer Vision"]
+  }
 ];

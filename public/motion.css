@@ -33,3 +33,6 @@
 @media(prefers-reduced-motion:reduce){.screenshot-stage .project-screenshot{transition:none}}
 
 .project-card .wordpress-visual{padding:14px;background:radial-gradient(ellipse at center,#273c38,#111915);align-items:center}.wordpress-artwork{display:block;width:100%;height:100%;object-fit:contain;transition:transform .5s ease}.project-card:hover .wordpress-artwork{transform:scale(1.04)}@media(prefers-reduced-motion:reduce){.project-card:hover .wordpress-artwork{transform:none}}
+
+.project-card .tomato-visual{padding:0;background:#f7f8f2;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tomato-screenshot{display:block;width:100%;height:100%;object-fit:contain}

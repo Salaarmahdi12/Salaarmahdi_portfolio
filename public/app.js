@@ -31,6 +31,10 @@ function renderProjects() {
     if(p.id === 'chronfit-ar') setupProjectGallery(visual,card,{title:p.title,folder:'chronfit',labels:['3D Watch Collection','Live AR Try-on']});
     if(p.id === 'fitfoot-ar') setupProjectGallery(visual,card,{title:p.title,folder:'fitfoot',labels:['Foot Measurements','Shoe Collection']});
     if(p.id === 'school-mgmt-system') setupProjectGallery(visual,card,{title:p.title,folder:'school',labels:['Sign-in Portal','Admin Dashboard','Teacher Dashboard']});
+    if(p.id === 'tomato-care') {
+      visual.replaceChildren();visual.removeAttribute('aria-hidden');visual.classList.add('tomato-visual');
+      const screenshot=el('img','tomato-screenshot');screenshot.src='assets/tomato-care/analyze.png';screenshot.alt='Tomato Care leaf photo upload and analysis screen';screenshot.loading='lazy';screenshot.decoding='async';visual.append(screenshot);
+    }
     if(p.id === 'wordpress-frontend-projects') {
       setupProjectGallery(visual,card,{title:p.title,folder:'wordpress',files:['web-development.png','web-design.jpg'],labels:['Web Development Illustration','Web Design Illustration'],mediaType:'images'});
     }
