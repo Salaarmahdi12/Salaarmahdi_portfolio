@@ -33,19 +33,20 @@ function renderProjects() {
     if(p.id === 'school-mgmt-system') setupProjectGallery(visual,card,{title:p.title,folder:'school',labels:['Sign-in Portal','Admin Dashboard','Teacher Dashboard']});
     if(p.id === 'tomato-care') {
       visual.replaceChildren();visual.removeAttribute('aria-hidden');visual.classList.add('tomato-visual');
-      const screenshot=el('img','tomato-screenshot');screenshot.src='assets/tomato-care/analyze.png';screenshot.alt='Tomato Care leaf photo upload and analysis screen';screenshot.loading='lazy';screenshot.decoding='async';visual.append(screenshot);
+      const screenshot=el('img','tomato-screenshot');screenshot.src='assets/tomato-care/analyze.webp';screenshot.alt='Tomato Care leaf photo upload and analysis screen';screenshot.loading='lazy';screenshot.decoding='async';visual.append(screenshot);
     }
     if(p.id === 'wordpress-frontend-projects') {
-      setupProjectGallery(visual,card,{title:p.title,folder:'wordpress',files:['web-development.png','web-design.jpg'],labels:['Web Development Illustration','Web Design Illustration'],mediaType:'images'});
+      setupProjectGallery(visual,card,{title:p.title,folder:'wordpress',files:['web-development.webp','web-design.webp'],labels:['Web Development Illustration','Web Design Illustration'],mediaType:'images'});
     }
     const meta=el('div','project-meta');const button=el('button','project-open','↗');button.setAttribute('aria-label','View '+p.title+' details');button.addEventListener('click',()=>openProject(p,button));meta.append(el('h3','',p.title),button);
+    if(p.caseStudy){const study=el('button','case-study-link','Read case study ↗');study.type='button';study.setAttribute('aria-label','Read '+p.title+' case study');study.addEventListener('click',()=>openProject(p,study));card.append(study);}
     const tags=el('div','tags');p.tags.forEach(t=>tags.append(el('span','',t)));
-    card.append(visual,meta,el('p','project-desc',p.description),tags);grid.append(card);
+    card.prepend(visual,meta,el('p','project-desc',p.description),tags);grid.append(card);
   });
   document.querySelector('#empty-state').hidden=shown.length>0;
   document.querySelector('#result-count').textContent=shown.length+' projects shown';
 }
-function openProject(p,button){lastProjectButton=button;document.querySelector('#dialog-title').textContent=p.title;document.querySelector('#dialog-category').textContent=p.category;document.querySelector('#dialog-description').textContent=p.detailedDescription;const tags=document.querySelector('#dialog-tags');tags.replaceChildren(...p.tags.map(t=>el('span','',t)));document.querySelector('#project-inquiry').href='mailto:'+email+'?subject='+encodeURIComponent('Let’s discuss '+p.title);dialog.showModal();document.body.style.overflow='hidden';}
+function openProject(p,button){lastProjectButton=button;document.querySelector('#dialog-title').textContent=p.title;document.querySelector('#dialog-category').textContent=p.category;document.querySelector('#dialog-description').textContent=p.detailedDescription;const tags=document.querySelector('#dialog-tags');tags.replaceChildren(...p.tags.map(t=>el('span','',t)));document.querySelector('#project-inquiry').href='mailto:'+email+'?subject='+encodeURIComponent('Let’s discuss '+p.title);renderCaseStudy(p);dialog.showModal();dialog.scrollTop=0;document.body.style.overflow='hidden';}
 dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
 dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
 dialog.addEventListener('close',()=>{document.body.style.overflow='';lastProjectButton?.focus();});
@@ -56,7 +57,16 @@ function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expand
 menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Close navigation':'Open navigation');});
 nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});
 document.querySelector('#copy-email').addEventListener('click',async()=>{const status=document.querySelector('#copy-status');try{await navigator.clipboard.writeText(email);status.textContent='Email copied to clipboard.'}catch{status.textContent='Please select and copy the email address above.'}});
-document.querySelector('#contact-form').addEventListener('submit',e=>{e.preventDefault();const form=e.currentTarget;const data=new FormData(form);const subject=encodeURIComponent('Portfolio inquiry from '+data.get('name').trim());const body=encodeURIComponent('Name: '+data.get('name').trim()+'\nEmail: '+data.get('email').trim()+'\n\n'+data.get('message').trim());document.querySelector('#form-status').textContent='Your draft is ready. Complete sending in your email app. If it doesn’t open, use the email address on this page.';window.location.href='mailto:'+email+'?subject='+subject+'&body='+body;});
+document.querySelector('#contact-form').addEventListener('submit', e => {
+  const form = e.currentTarget;
+  for (const field of ['name', 'email', 'message']) {
+    const input = form.elements.namedItem(field);
+    input.value = input.value.trim();
+  }
+  if (!form.reportValidity()) { e.preventDefault(); return; }
+  form.elements.namedItem('_subject').value = 'Portfolio message from ' + form.elements.namedItem('name').value;
+  document.querySelector('#form-status').textContent = 'Opening secure submission. Follow the next page to finish sending your message.';
+});
 document.querySelector('#year').textContent=new Date().getFullYear();
 if(!reducedMotion && 'IntersectionObserver' in window){document.documentElement.classList.add('motion-ready');const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:0.08});document.querySelectorAll('.reveal').forEach(e=>observer.observe(e));}
 let ticking=false;function progress(){const max=document.documentElement.scrollHeight-innerHeight;document.querySelector('.scroll-progress').style.width=(max>0?scrollY/max*100:0)+'%';ticking=false;}window.addEventListener('scroll',()=>{if(!ticking){requestAnimationFrame(progress);ticking=true}},{passive:true});progress();
@@ -71,7 +81,7 @@ if (portraitSwitch) {
   const show = index => {
     current = index;
     photos.forEach((photo, i) => {
-      photo.classList.toggle('is-active', i === current);
+      if(i===current&&!photo.getAttribute('src'))photo.src=photo.dataset.src;photo.classList.toggle('is-active', i === current);
       photo.setAttribute('aria-hidden', 'true');
     });
     portraitSwitch.setAttribute('aria-label', `Salaar Mahdi, photo ${current + 1} of ${photos.length}. Show next photo`);
@@ -100,7 +110,7 @@ function setupProjectGallery(visual,card,config) {
   visual.replaceChildren();visual.removeAttribute('aria-hidden');visual.classList.add('screenshot-gallery');
   visual.setAttribute('role','region');visual.setAttribute('aria-label',config.title+' '+(config.mediaType || 'screenshots'));
   const stage=el('div','screenshot-stage');
-  const images=labels.map((label,i)=>{const img=el('img','project-screenshot');img.src='assets/'+config.folder+'/'+(config.files?.[i] || (i+1)+'.png');img.alt=config.title+' — '+label;img.loading='lazy';img.decoding='async';stage.append(img);return img;});
+  const images=labels.map((label,i)=>{const img=el('img','project-screenshot');img.dataset.src='assets/'+config.folder+'/'+(config.files?.[i] || (i+1)+'.webp');if(i===0)img.src=img.dataset.src;img.alt=config.title+' — '+label;img.loading='lazy';img.decoding='async';stage.append(img);return img;});
   const controls=el('div','screenshot-controls');
   const previous=el('button','screenshot-arrow','‹');previous.type='button';previous.setAttribute('aria-label','Previous screenshot');
   const next=el('button','screenshot-arrow','›');next.type='button';next.setAttribute('aria-label','Next screenshot');
@@ -109,7 +119,7 @@ function setupProjectGallery(visual,card,config) {
   const dotButtons=labels.map((label,i)=>{const dot=el('button','screenshot-dot');dot.type='button';dot.setAttribute('aria-label','Show '+label+' screenshot');dot.addEventListener('click',()=>{stop();show(i)});dots.append(dot);return dot;});
   const pause=el('button','screenshot-pause','Ⅱ');pause.type='button';pause.setAttribute('aria-label','Pause screenshot slideshow');pause.disabled=true;
   let index=0,timer=null,hovering=false,paused=false;
-  function show(i){index=(i+images.length)%images.length;images.forEach((img,n)=>{img.classList.toggle('is-current',n===index);img.setAttribute('aria-hidden',String(n!==index))});dotButtons.forEach((dot,n)=>dot.setAttribute('aria-pressed',String(n===index)));caption.textContent=(index+1)+' / '+images.length+' · '+labels[index];}
+  function show(i){index=(i+images.length)%images.length;images.forEach((img,n)=>{if(n===index&&!img.getAttribute('src'))img.src=img.dataset.src;img.classList.toggle('is-current',n===index);img.setAttribute('aria-hidden',String(n!==index))});dotButtons.forEach((dot,n)=>dot.setAttribute('aria-pressed',String(n===index)));caption.textContent=(index+1)+' / '+images.length+' · '+labels[index];}
   function stop(){clearInterval(timer);timer=null;pause.disabled=true;}
   function start(){if(timer||paused||reducedMotion||document.hidden)return;pause.disabled=false;timer=setInterval(()=>show(index+1),1800);}
   card.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse'){hovering=true;paused=false;start();}});
@@ -122,4 +132,13 @@ function setupProjectGallery(visual,card,config) {
   const visibility=()=>{if(document.hidden)stop();};document.addEventListener('visibilitychange',visibility);
   galleryCleanups.push(()=>{stop();document.removeEventListener('visibilitychange',visibility)});
   controls.append(previous,caption,dots,next,pause);visual.append(stage,controls);show(0);
+}
+
+function renderCaseStudy(project){
+  const container=document.querySelector('#dialog-case-study');
+  container.replaceChildren();
+  dialog.classList.toggle('has-case-study',Boolean(project.caseStudy));
+  if(!project.caseStudy)return;
+  container.append(el('p','case-study-label',project.caseStudy.label));
+  project.caseStudy.sections.forEach(item=>{const section=el('section','case-study-section');section.append(el('h3','',item.title),el('p','',item.text));container.append(section);});
 }
